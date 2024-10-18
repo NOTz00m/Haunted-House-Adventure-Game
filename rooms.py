@@ -68,7 +68,7 @@ def explore_current_room(skeleton):
             skeleton.bones.append(found_bone)
             return f"Success: You found your {found_bone}! It's reattached."
         else:
-            return "Search: You can't find any bones here."
+            return "Search: You couldn't find anything."
     elif event == "fact":
         fact = get_random_fact()
         skeleton.collect_fact()
