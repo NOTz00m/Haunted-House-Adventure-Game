@@ -152,7 +152,7 @@ frame = tk.Frame(window)
 frame.pack(padx=10, pady=10)
 
 room_icon_label = tk.Label(frame)
-room_icon_label.pack(side=tk.TOP, anchor='ne')  # top right
+room_icon_label.pack(side=tk.TOP, anchor='n')  # top middle
 
 room_text = tk.StringVar()
 room_label = tk.Label(frame, textvariable=room_text, justify="left")
