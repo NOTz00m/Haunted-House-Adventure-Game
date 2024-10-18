@@ -1,6 +1,6 @@
 # Haunted House Adventure Game
 
-#P.S: THIS CODE IS ALSO UPLOADED ON REPL AT: https://replit.com/@lucaplaysog/Halloween-Coding-Competition?v=1
+#P.S: THIS CODE IS ALSO UPLOADED ON REPL AT: https://replit.com/@notz00m/Halloween-Coding-Competition?v=1
 
 ## Overview
 
