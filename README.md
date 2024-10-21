@@ -32,3 +32,4 @@ Welcome to the Haunted House Adventure Game! In this interactive adventure, you 
 2. Install the required packages:
    ```bash
    pip install pygame
+3. Run main.py
