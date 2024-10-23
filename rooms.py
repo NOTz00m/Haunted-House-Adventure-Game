@@ -68,7 +68,9 @@ def explore_current_room(skeleton):
         found_bone = skeleton.find_bone()
         if found_bone:
             skeleton.bones.append(found_bone)
-            return f"Success: You found your {found_bone}! It's reattached."
+            achievement_unlocked = skeleton.unlock_achievement("Find your first bone")
+            return f"Success: You found your {found_bone}! It's reattached." + (
+                "\nAchievement unlocked: Find your first bone!" if achievement_unlocked else "")
         else:
             return "Search: You couldn't find anything."
     elif event == "fact":
@@ -96,7 +98,7 @@ def random_event(skeleton):
         # pick room for hint
         hinted_room = random.choice(list(rooms.keys()))
         skeleton.mark_room_as_hinted(hinted_room)
-        return f"Event: A ghost whispers, 'You may find what you seek in the {hinted_room}...'"
+        return f"Event: A ghost whispers, 'Find what you seek in the {hinted_room}...'"
     elif event == "creak":
         return "Event: The floor creaks ominously beneath your feet."
     elif event == "shadow":
