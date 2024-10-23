@@ -7,6 +7,8 @@ class Skeleton:
         self.bones = all_bones.copy()
         self.lost_bones = []
 
+        self.achievements = set()  # track unlocked achievements
+        
         # lose 2-4 bones at start of game
         num_lost = random.randint(2, 4)
         for _ in range(num_lost):
@@ -56,3 +58,10 @@ class Skeleton:
 
     def has_won(self):
         return len(self.lost_bones) == 0
+
+    def unlock_achievement(self, achievement):
+        """Unlock an achievement if not already unlocked."""
+        if achievement not in self.achievements:
+            self.achievements.add(achievement)
+            return True
+        return False
