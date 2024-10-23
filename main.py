@@ -3,6 +3,7 @@ from tkinter import PhotoImage
 import pygame
 from skeleton import Skeleton
 from rooms import move_room, explore_current_room
+from achievements import AchievementManager
 import monsters # needed here before, left here just in case
 
 # init music
@@ -10,6 +11,9 @@ pygame.mixer.init()
 pygame.mixer.music.load('haloweenmusic.mp3') 
 pygame.mixer.music.play(-1)  # inf loop
 pygame.mixer.music.set_volume(0.2)
+
+# init achievement manager
+achievement_manager = AchievementManager()
 
 # GAME END/WIN FUNCTIONALITY:
 
@@ -94,7 +98,7 @@ def on_move(direction):
     if skeleton.has_won():
         win_game()
         return
-    
+
     # could probably improve this
     if "Random fact found:" in result:
         update_result_display(result, "orange")
@@ -103,6 +107,11 @@ def on_move(direction):
     else:
         update_result_display(result, "black")
     update_status()
+
+    # check for new achievements
+    achievement_messages = achievement_manager.check_achievements(skeleton)
+    for message in achievement_messages:
+        update_result_display(message, "blue")  # display achievement in blue
 
 def on_explore():
     result = explore_current_room(skeleton)
@@ -114,20 +123,28 @@ def on_explore():
     if skeleton.has_won():
         win_game()
         return
-    
+
     if "Random fact found:" in result:
         update_result_display(result, "orange")
+    elif "Achievement unlocked:" in result:
+        update_result_display(result, "green", delay_achievement=True)
     elif "Event:" in result or "Success:" in result:
         update_result_display(result, "red")
     else:
         update_result_display(result, "black")
     update_status()
 
+    # check for new achievements
+    achievement_messages = achievement_manager.check_achievements(skeleton)
+    for message in achievement_messages:
+        update_result_display(message, "blue")  # display achievement in blue
+    
 def on_quit():
     pygame.mixer.music.stop()
     window.destroy()
 
-def update_result_display(message, color):
+def update_result_display(message, color, delay_achievement=False):
+    """Update the result display with a message of the given color."""
     result_text_widget.config(state=tk.NORMAL)
     result_text_widget.delete(1.0, tk.END)  # clear prev
 
@@ -140,6 +157,22 @@ def update_result_display(message, color):
 
     result_text_widget.config(state=tk.DISABLED)  # make read-only
 
+    # check if achievement should display after delay
+    if delay_achievement and "Achievement unlocked:" in message:
+        window.after(3500, lambda: update_result_display("Achievement unlocked!", "green"))
+
+def show_achievements():
+    """Display a pop-up window listing unlocked achievements."""
+    achievements_window = tk.Toplevel(window)
+    achievements_window.title("Journal - Achievements")
+
+    tk.Label(achievements_window, text="Unlocked Achievements:").pack(pady=(10, 5))
+
+    if skeleton.achievements:
+        for achievement in skeleton.achievements:
+            tk.Label(achievements_window, text=f"- {achievement}").pack(anchor="w", padx=10)
+    else:
+        tk.Label(achievements_window, text="No achievements unlocked yet.").pack(pady=10)
 
 # init game, tkinter window here as well
 skeleton = Skeleton()
@@ -164,7 +197,10 @@ status_label.pack()
 
 result_text_widget = tk.Text(frame, height=5, width=50)
 result_text_widget.pack(pady=(10, 0))
-result_text_widget.config(state=tk.DISABLED)  # make it read-only
+result_text_widget.config(state=tk.DISABLED)  # make read-only
+
+journal_button = tk.Button(frame, text="Journal", command=show_achievements)
+journal_button.pack(pady=(5, 0))
 
 room_icons = {
     "Entrance Hall": PhotoImage(file="icons/entrance_hall.png"),
