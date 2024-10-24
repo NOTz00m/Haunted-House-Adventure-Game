@@ -1,8 +1,9 @@
 import tkinter as tk
+from tkinter import PhotoImage
 import pygame
 from skeleton import Skeleton
 from rooms import move_room, explore_current_room
-import monsters # might need here for something
+import monsters # needed here before, left here just in case
 
 # init music
 pygame.mixer.init()
@@ -73,9 +74,15 @@ def win_game():
         quit_button = tk.Button(frame, text="Quit", command=on_quit)
         quit_button.pack(pady=5)
 
+################
+
 def update_status():
     status_text.set(skeleton.get_status())
     room_text.set(f"Current location: {skeleton.current_room}")
+
+    room_icon = room_icons[skeleton.current_room]
+    room_icon_label.config(image=room_icon)
+    room_icon_label.image = room_icon  # keep ref to avoid garbage collection
 
 def on_move(direction):
     result = move_room(skeleton, direction)
@@ -140,8 +147,12 @@ window = tk.Tk()
 window.title("Haunted House Adventure")
 
 # disp elements
+
 frame = tk.Frame(window)
 frame.pack(padx=10, pady=10)
+
+room_icon_label = tk.Label(frame)
+room_icon_label.pack(side=tk.TOP, anchor='n')  # top middle
 
 room_text = tk.StringVar()
 room_label = tk.Label(frame, textvariable=room_text, justify="left")
@@ -154,6 +165,18 @@ status_label.pack()
 result_text_widget = tk.Text(frame, height=5, width=50)
 result_text_widget.pack(pady=(10, 0))
 result_text_widget.config(state=tk.DISABLED)  # make it read-only
+
+room_icons = {
+    "Entrance Hall": PhotoImage(file="icons/entrance_hall.png"),
+    "Creepy Library": PhotoImage(file="icons/creepy_library.png"),
+    "Dark Cellar": PhotoImage(file="icons/dark_cellar.png"),
+    "Spooky Kitchen": PhotoImage(file="icons/spooky_kitchen.png"),
+    "Cursed Ballroom": PhotoImage(file="icons/cursed_ballroom.png"),
+    "Mystic Garden": PhotoImage(file="icons/mystic_garden.png"),
+    "Haunted Attic": PhotoImage(file="icons/haunted_attic.png"),
+    "Forgotten Graveyard": PhotoImage(file="icons/forgotten_graveyard.png"),
+    "Phantom Cave": PhotoImage(file="icons/phantom_cave.png")
+}
 
 # diamond layout
 button_frame = tk.Frame(frame)
