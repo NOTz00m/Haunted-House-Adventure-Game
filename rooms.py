@@ -11,6 +11,7 @@ rooms = {
     },
     "Creepy Library": {
         "right": "Entrance Hall",
+        "down": "Haunted Attic",
         "description": "Books line the walls, their spines cracked. A chill runs down your spine."
     },
     "Dark Cellar": {
@@ -29,19 +30,20 @@ rooms = {
     },
     "Mystic Garden": {
         "left": "Cursed Ballroom",
+        "up": "Forgotten Graveyard",
         "description": "An overgrown garden where ghostly flowers bloom under the moonlight."
     },
-    # add new rooms
     "Haunted Attic": {
         "down": "Creepy Library",
         "description": "Dusty trunks and old furniture fill this attic, with whispers in the air."
     },
     "Forgotten Graveyard": {
+        "down": "Phantom Cave",
         "up": "Mystic Garden",
         "description": "Weathered tombstones are scattered about, and an eerie silence surrounds you."
     },
     "Phantom Cave": {
-        "left": "Forgotten Graveyard",
+        "up": "Forgotten Graveyard",
         "description": "The cave is dark and damp, echoing with the sound of dripping water."
     }
 } # this code is a little hacky, but it works
@@ -56,7 +58,7 @@ def move_room(skeleton, direction):
         return "You can't move in that direction from here."
 
 def explore_current_room(skeleton):
-    event = random.choice(["monster", "bone", "fact"])
+    event = random.choice(["monster", "bone", "fact", "random_event"])
     result = ""
 
     if event == "monster":
@@ -73,6 +75,9 @@ def explore_current_room(skeleton):
         fact = get_random_fact()
         skeleton.collect_fact()
         return f"Random fact found: {fact}"
+    elif event == "random_event":
+        result = random_event(skeleton)
+        return result
 
 def style_result(text):
     # AHHHHHHHHHHHHHHHH why does this not work
@@ -83,3 +88,16 @@ def style_result(text):
         return f"\033[31m{text}\033[0m" #red
     elif "Search:" in text:
         return text
+
+def random_event(skeleton):
+    event = random.choice(["whisper", "creak", "shadow"])
+
+    if event == "whisper":
+        # pick room for hint
+        hinted_room = random.choice(list(rooms.keys()))
+        skeleton.mark_room_as_hinted(hinted_room)
+        return f"Event: A ghost whispers, 'You may find what you seek in the {hinted_room}...'"
+    elif event == "creak":
+        return "Event: The floor creaks ominously beneath your feet."
+    elif event == "shadow":
+        return "Event: A shadow darts past, just out of sight."
