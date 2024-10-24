@@ -16,6 +16,7 @@ class Skeleton:
 
         self.facts_collected = 0
         self.current_room = "Entrance Hall"
+        self.hinted_rooms = {}  # track room with hint
 
     def lose_bone(self, bone):
         if bone in self.bones:
@@ -23,8 +24,14 @@ class Skeleton:
             self.lost_bones.append(bone)
 
     def find_bone(self):
-        base_probability = 0.4
+        if self.current_room in self.hinted_rooms:
+            # if first exploration in room, guarantee a bone
+            if not self.hinted_rooms[self.current_room]["found"]:
+                self.hinted_rooms[self.current_room]["found"] = True
+                return self.lost_bones.pop(0)
 
+        base_probability = 0.4
+        
         if self.facts_collected >= 6:
             base_probability = 0.5
 
@@ -34,6 +41,10 @@ class Skeleton:
 
     def collect_fact(self):
         self.facts_collected += 1
+
+    def mark_room_as_hinted(self, room):
+        if room not in self.hinted_rooms:
+            self.hinted_rooms[room] = {"hinted": True, "found": False}  # init tracking
 
     def get_status(self):
         bones_status = f"Currently has: {', '.join(self.bones)}"
