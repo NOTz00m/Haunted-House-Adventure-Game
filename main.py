@@ -1,9 +1,39 @@
 import tkinter as tk
+import pickle
 from tkinter import PhotoImage
 import pygame
 from skeleton import Skeleton
 from rooms import move_room, explore_current_room
 import monsters # needed here before, left here just in case
+
+# save/load game
+def save_game():
+    game_state = {
+        "current_room": skeleton.current_room,
+        "bones": skeleton.bones,
+        "lost_bones": skeleton.lost_bones,
+        "facts_collected": skeleton.facts_collected,
+        "hinted_rooms": skeleton.hinted_rooms
+    }
+    with open("savegame.pkl", "wb") as file:
+        pickle.dump(game_state, file)
+    update_result_display("Game saved successfully.", "green")
+
+def load_game():
+    try:
+        with open("savegame.pkl", "rb") as file:
+            game_state = pickle.load(file)
+
+            skeleton.current_room = game_state["current_room"]
+            skeleton.bones = game_state["bones"]
+            skeleton.lost_bones = game_state["lost_bones"]
+            skeleton.facts_collected = game_state["facts_collected"]
+            skeleton.hinted_rooms = game_state["hinted_rooms"]
+
+        update_status()
+        update_result_display("Game loaded successfully.", "green")
+    except FileNotFoundError:
+        update_result_display("No save file found. Save a game first.", "red")
 
 # init music
 pygame.mixer.init()
@@ -200,6 +230,13 @@ right_button.grid(row=1, column=2)
 
 quit_button = tk.Button(frame, text="Quit", command=on_quit)
 quit_button.pack(pady=5)
+
+# save/load buttons
+save_button = tk.Button(frame, text="Save Game", command=save_game)
+save_button.pack(pady=5, side=tk.LEFT)
+
+load_button = tk.Button(frame, text="Load Game", command=load_game)
+load_button.pack(pady=5, side=tk.RIGHT)
 
 update_status()
 window.mainloop()
