@@ -1,8 +1,39 @@
 import tkinter as tk
+import pickle
+from tkinter import PhotoImage
 import pygame
 from skeleton import Skeleton
 from rooms import move_room, explore_current_room
-import monsters # might need here for something
+import monsters # needed here before, left here just in case
+
+# save/load game
+def save_game():
+    game_state = {
+        "current_room": skeleton.current_room,
+        "bones": skeleton.bones,
+        "lost_bones": skeleton.lost_bones,
+        "facts_collected": skeleton.facts_collected,
+        "hinted_rooms": skeleton.hinted_rooms
+    }
+    with open("savegame.pkl", "wb") as file:
+        pickle.dump(game_state, file)
+    update_result_display("Game saved successfully.", "green")
+
+def load_game():
+    try:
+        with open("savegame.pkl", "rb") as file:
+            game_state = pickle.load(file)
+
+            skeleton.current_room = game_state["current_room"]
+            skeleton.bones = game_state["bones"]
+            skeleton.lost_bones = game_state["lost_bones"]
+            skeleton.facts_collected = game_state["facts_collected"]
+            skeleton.hinted_rooms = game_state["hinted_rooms"]
+
+        update_status()
+        update_result_display("Game loaded successfully.", "green")
+    except FileNotFoundError:
+        update_result_display("No save file found. Save a game first.", "red")
 
 # init music
 pygame.mixer.init()
@@ -73,9 +104,15 @@ def win_game():
         quit_button = tk.Button(frame, text="Quit", command=on_quit)
         quit_button.pack(pady=5)
 
+################
+
 def update_status():
     status_text.set(skeleton.get_status())
     room_text.set(f"Current location: {skeleton.current_room}")
+
+    room_icon = room_icons[skeleton.current_room]
+    room_icon_label.config(image=room_icon)
+    room_icon_label.image = room_icon  # keep ref to avoid garbage collection
 
 def on_move(direction):
     result = move_room(skeleton, direction)
@@ -140,8 +177,12 @@ window = tk.Tk()
 window.title("Haunted House Adventure")
 
 # disp elements
+
 frame = tk.Frame(window)
 frame.pack(padx=10, pady=10)
+
+room_icon_label = tk.Label(frame)
+room_icon_label.pack(side=tk.TOP, anchor='n')  # top middle
 
 room_text = tk.StringVar()
 room_label = tk.Label(frame, textvariable=room_text, justify="left")
@@ -154,6 +195,18 @@ status_label.pack()
 result_text_widget = tk.Text(frame, height=5, width=50)
 result_text_widget.pack(pady=(10, 0))
 result_text_widget.config(state=tk.DISABLED)  # make it read-only
+
+room_icons = {
+    "Entrance Hall": PhotoImage(file="icons/entrance_hall.png"),
+    "Creepy Library": PhotoImage(file="icons/creepy_library.png"),
+    "Dark Cellar": PhotoImage(file="icons/dark_cellar.png"),
+    "Spooky Kitchen": PhotoImage(file="icons/spooky_kitchen.png"),
+    "Cursed Ballroom": PhotoImage(file="icons/cursed_ballroom.png"),
+    "Mystic Garden": PhotoImage(file="icons/mystic_garden.png"),
+    "Haunted Attic": PhotoImage(file="icons/haunted_attic.png"),
+    "Forgotten Graveyard": PhotoImage(file="icons/forgotten_graveyard.png"),
+    "Phantom Cave": PhotoImage(file="icons/phantom_cave.png")
+}
 
 # diamond layout
 button_frame = tk.Frame(frame)
@@ -177,6 +230,13 @@ right_button.grid(row=1, column=2)
 
 quit_button = tk.Button(frame, text="Quit", command=on_quit)
 quit_button.pack(pady=5)
+
+# save/load buttons
+save_button = tk.Button(frame, text="Save Game", command=save_game)
+save_button.pack(pady=5, side=tk.LEFT)
+
+load_button = tk.Button(frame, text="Load Game", command=load_game)
+load_button.pack(pady=5, side=tk.RIGHT)
 
 update_status()
 window.mainloop()
