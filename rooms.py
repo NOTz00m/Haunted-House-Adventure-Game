@@ -57,13 +57,33 @@ def move_room(skeleton, direction):
     else:
         return "You can't move in that direction from here."
 
-def explore_current_room(skeleton):
+def explore_current_room(skeleton, use_spectral_search=False):
+    """
+    Explore the current room for bones, facts, monsters, or random events.
+    
+    Args:
+        skeleton: The player's Skeleton instance
+        use_spectral_search: If True, guarantees finding a bone (if any remain)
+    
+    Returns:
+        str: Description of what happened during exploration
+    """
+    # Spectral Search ability - guarantee bone finding
+    if use_spectral_search:
+        found_bone = skeleton.spectral_search()
+        if found_bone:
+            skeleton.bones.append(found_bone)
+            return f"Success: Your spectral search revealed your {found_bone}! It's reattached."
+        else:
+            return "Search: Your spectral search found nothing - you have all your bones!"
+    
     event = random.choice(["monster", "bone", "fact", "random_event"])
     result = ""
 
     if event == "monster":
-        result = encounter_monster(skeleton)
-        return f"Event: {result}"
+        # Monster encounters now return just the string, combat handled in UI
+        result = "COMBAT_TRIGGER"  # Special flag for main.py to handle combat
+        return result
     elif event == "bone":
         found_bone = skeleton.find_bone()
         if found_bone:
