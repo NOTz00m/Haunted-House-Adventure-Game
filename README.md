@@ -140,4 +140,4 @@ This project welcomes improvements! Areas for contribution:
 
 ---
 
-**Enjoy the game! Can you find all your bones and unlock all achievements?** 🦴👻🎃
+**Enjoy the game! Can you find all your bones and unlock all achievements?**
